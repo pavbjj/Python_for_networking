@@ -1,11 +1,12 @@
 #!/usr/bin/python
+import random
 import socket
+import string
 import sys
 
-"""Traffic generator, it generates simple udp or tcp stream"""
 
-def arguments(*args):
-    if len(sys.argv) == 4:
+def argumenty(*args):
+    if len(sys.argv) == 6:
         protocol = sys.argv[1]
         ip = sys.argv[2]
         if sys.argv[1] == "udp" or sys.argv[1] == "UDP":
@@ -15,23 +16,27 @@ def arguments(*args):
         else:
             print("Invalid protocol! Use udp or tcp")
         port = int(sys.argv[3])
+        times = int(sys.argv[4])
+        repetitions = int(sys.argv[5])
     else:
         print(
-            "Incorrect number of arguments, run like : protocol ip port ")
+            "Incorrect number of arguments, run like : protocol ip port bytes count ")
         exit(1)
-    return protocol, ip, port
+    return protocol, ip, port, times, repetitions
 
 
 def main():
     print("Ctrl+c to exit the program!")
-    for i in range(10):
-        protocol, ip, port = argumenty()
-        send_packet = "Testing data"
+    protocol, ip, port, times,repetitions = argumenty()
+    print(repetitions)
+    for i in range(repetitions):
+        protocol, ip, port, times, repetitions = argumenty()
+        send_packet = ''.join(random.choice(string.ascii_lowercase) for i in range(times))
         length = len(send_packet)
         try:
             protocol.connect((ip, port))
             protocol.send(send_packet.encode('utf-8'))
-            print("Successfully sent {} packet to {} with {} bytes, on port {}".format(i + 1, ip, length, port))
+            print("Successfully sent  {} packet to {} with {} bytes, on port {}".format(i + 1, ip, length, port))
         except socket.error:
             print("Error, unable to create TCP socket, does remote end listen on:TCP/{} ?".format(port))
         finally:
